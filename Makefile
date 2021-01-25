@@ -138,10 +138,29 @@ $(LUAI) : $(LIBLUA) $(LUAIOBJS)
 !IF "$(TARGET)" == "lib"
 $(LUAC) : $(LIBLUA) $(LUACOBJS)
 	$(RC) $(RFLAGS) /d BIN_NAME="luac.exe" /d APP_NAME="Lua Compiler" /d APP_FILE /d ICO_FILE /fo $(WORKDIR)\luac.res $(SRCDIR)\lua.rc
-	$(LN) $(LFLAGS) $(LUACOBJS) $(WORKDIR)\lua.res $(LLUA) $(LDLIBS) /out:$(LUAC)
+	$(LN) $(LFLAGS) $(LUACOBJS) $(WORKDIR)\luac.res $(LLUA) $(LDLIBS) /out:$(LUAC)
 !ELSE
 $(LUAC) :
 
+!ENDIF
+
+!IF !DEFINED(PREFIX) || "$(PREFIX)" == ""
+install:
+	@echo PREFIX is not defined
+	@echo Use `nmake install PREFIX=directory`
+	@echo.
+	@exit /B 1
+!ELSE
+install : all
+!IF "$(TARGET)" == "dll"
+	@xcopy /I /Y /Q "$(WORKDIR)\*.dll" "$(PREFIX)\bin"
+!ENDIF
+	@xcopy /I /Y /Q "$(WORKDIR)\*.exe" "$(PREFIX)\bin"
+	@xcopy /I /Y /Q "$(WORKDIR)\*.lib" "$(PREFIX)\lib"
+	@xcopy /I /Y /Q "$(SRCDIR)\src\lua.h*" "$(PREFIX)\include"
+	@xcopy /Y /Q "$(SRCDIR)\src\luaconf.h" "$(PREFIX)\include"
+	@xcopy /Y /Q "$(SRCDIR)\src\lualib.h" "$(PREFIX)\include"
+	@xcopy /Y /Q "$(SRCDIR)\src\lauxlib.h" "$(PREFIX)\include"
 !ENDIF
 
 clean:
