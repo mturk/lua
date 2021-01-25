@@ -47,6 +47,10 @@ CRT_CFLAGS = -MD
 SRCDIR = .
 !ENDIF
 
+!IF !DEFINED(TARGET_LIB) || "$(TARGET_LIB)" == ""
+TARGET_LIB = lib
+!ENDIF
+
 CFLAGS = $(CFLAGS) -I$(SRCDIR)\src
 CFLAGS = $(CFLAGS) -DNDEBUG -DWIN32 -D_WIN32_WINNT=$(WINVER) -DWINVER=$(WINVER)
 CFLAGS = $(CFLAGS) -DLUA_COMPAT_5_3 -D_CRT_SECURE_NO_WARNINGS
@@ -133,7 +137,7 @@ $(LIBLUA) : $(WORKDIR) $(LLUAOBJS)
 !ENDIF
 
 $(LUAI) : $(LIBLUA) $(LUAIOBJS)
-	$(RC) $(RFLAGS) /d BIN_NAME="lua.exe" /d APP_NAME="Lua Interpreter" /d APP_FILE /d ICO_FILE /fo $(WORKDIR)\lua.res $(SRCDIR)\lua.rc
+	$(RC) $(RFLAGS) /d BIN_NAME="lua.exe" /d APP_NAME="Lua Command Line Interpreter" /d APP_FILE /d ICO_FILE /fo $(WORKDIR)\lua.res $(SRCDIR)\lua.rc
 	$(LN) $(LFLAGS) $(LUAIOBJS) $(WORKDIR)\lua.res $(LLUA) $(LDLIBS) /out:$(LUAI)
 
 !IF "$(TARGET)" == "lib"
@@ -146,7 +150,7 @@ $(LUAC) :
 !ENDIF
 
 !IF !DEFINED(PREFIX) || "$(PREFIX)" == ""
-install:
+install :
 	@echo PREFIX is not defined
 	@echo Use `nmake install PREFIX=directory`
 	@echo.
@@ -157,12 +161,12 @@ install : all
 	@xcopy /I /Y /Q "$(WORKDIR)\*.dll" "$(PREFIX)\bin"
 !ENDIF
 	@xcopy /I /Y /Q "$(WORKDIR)\*.exe" "$(PREFIX)\bin"
-	@xcopy /I /Y /Q "$(WORKDIR)\*.lib" "$(PREFIX)\lib"
+	@xcopy /I /Y /Q "$(WORKDIR)\*.lib" "$(PREFIX)\$(TARGET_LIB)"
 	@xcopy /I /Y /Q "$(SRCDIR)\src\lua.h*" "$(PREFIX)\include"
 	@xcopy /Y /Q "$(SRCDIR)\src\luaconf.h" "$(PREFIX)\include"
-	@xcopy /Y /Q "$(SRCDIR)\src\lualib.h" "$(PREFIX)\include"
+	@xcopy /Y /Q "$(SRCDIR)\src\lualib.h"  "$(PREFIX)\include"
 	@xcopy /Y /Q "$(SRCDIR)\src\lauxlib.h" "$(PREFIX)\include"
 !ENDIF
 
-clean:
+clean :
 	@-rd /S /Q $(WORKDIR) 2>NUL
