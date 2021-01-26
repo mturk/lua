@@ -87,6 +87,12 @@ LLUA    = $(WORKDIR)\$(LDNAME).lib
 LUAI    = $(WORKDIR)\lua.exe
 LUAC    = $(WORKDIR)\luac.exe
 
+!IF DEFINED(_DEBUG)
+LLUAPDB = /pdb:$(WORKDIR)\$(LDNAME).pdb
+LUAIPDB = /pdb:$(WORKDIR)\lua.pdb
+LUACPDB = /pdb:$(WORKDIR)\luac.pdb
+!ENDIF
+
 CLOPTS = /c /nologo $(CRT_CFLAGS) -W3 -O2 -Ob2
 RFLAGS = /l 0x409 /n /i $(SRCDIR)\src $(RFLAGS) /d WIN32 /d WINNT /d WINVER=$(WINVER)
 RFLAGS = $(RFLAGS) /d _WIN32_WINNT=$(WINVER) $(EXTRA_RFLAGS)
@@ -138,25 +144,30 @@ $(WORKDIR) :
 	@-md $(WORKDIR)
 
 {$(SRCDIR)\src}.c{$(WORKDIR)}.obj:
-	$(CC) $(CLOPTS) $(CFLAGS) -Fo$(WORKDIR)\ $<
+	$(CC) $(CLOPTS) $(CFLAGS) -Fo$(WORKDIR)\ -Fd$(WORKDIR)\$(LDNAME) $<
 
+$(LUAIOBJS) :
+	$(CC) $(CLOPTS) $(CFLAGS) -Fo$(WORKDIR)\ -Fd$(WORKDIR)\lua  $(SRCDIR)\src\lua.c
+
+$(LUACOBJS) :
+	$(CC) $(CLOPTS) $(CFLAGS) -Fo$(WORKDIR)\ -Fd$(WORKDIR)\luac $(SRCDIR)\src\luac.c
 
 $(LIBLUA) : $(WORKDIR) $(LLUAOBJS)
 !IF "$(TARGET)" == "dll"
 	$(RC) $(RFLAGS) /d BIN_NAME="$(LDNAME).dll" /d APP_NAME="Lua Library" /fo $(WORKDIR)\$(LDNAME).res $(SRCDIR)\lua.rc
-	$(LN) $(LDFLAGS) $(LLUAOBJS) $(WORKDIR)\$(LDNAME).res $(LDLIBS) /out:$(LIBLUA)
+	$(LN) $(LDFLAGS) $(LLUAOBJS) $(WORKDIR)\$(LDNAME).res $(LDLIBS) $(LLUAPDB) /out:$(LIBLUA)
 !ELSE
 	$(AR) $(ARFLAGS) $(LLUAOBJS) /out:$(LIBLUA)
 !ENDIF
 
 $(LUAI) : $(LIBLUA) $(LUAIOBJS)
 	$(RC) $(RFLAGS) /d BIN_NAME="lua.exe" /d APP_NAME="Lua Command Line Interpreter" /d APP_FILE /d ICO_FILE /fo $(WORKDIR)\lua.res $(SRCDIR)\lua.rc
-	$(LN) $(LFLAGS) $(LUAIOBJS) $(WORKDIR)\lua.res $(LLUA) $(LDLIBS) /out:$(LUAI)
+	$(LN) $(LFLAGS) $(LUAIOBJS) $(WORKDIR)\lua.res $(LLUA) $(LDLIBS) $(LUAIPDB) /out:$(LUAI)
 
 !IF "$(TARGET)" == "lib"
 $(LUAC) : $(LIBLUA) $(LUACOBJS)
 	$(RC) $(RFLAGS) /d BIN_NAME="luac.exe" /d APP_NAME="Lua Compiler" /d APP_FILE /d ICO_FILE /fo $(WORKDIR)\luac.res $(SRCDIR)\lua.rc
-	$(LN) $(LFLAGS) $(LUACOBJS) $(WORKDIR)\luac.res $(LLUA) $(LDLIBS) /out:$(LUAC)
+	$(LN) $(LFLAGS) $(LUACOBJS) $(WORKDIR)\luac.res $(LLUA) $(LDLIBS) $(LUACPDB) /out:$(LUAC)
 !ELSE
 $(LUAC) :
 
