@@ -26,8 +26,14 @@
 #include "lua.h"
 #include <winver.h>
 
-#define LUA_VERSION_STR LUA_VERSION_MAJOR "." LUA_VERSION_MINOR "." LUA_VERSION_RELEASE
-#define LUA_VERSION_CSV 5,4,2
+#define LUA_VERSION_VENDOR "-2"
+#define LUA_VERSION_STR \
+        LUA_VERSION_MAJOR "." \
+        LUA_VERSION_MINOR "." \
+        LUA_VERSION_RELEASE \
+        LUA_VERSION_VENDOR
+
+#define LUA_VERSION_CSV     5,4,2
 #define STRINGIFY_HELPER(n) #n
 #define STRINGIFY(n)        STRINGIFY_HELPER(n)
 
