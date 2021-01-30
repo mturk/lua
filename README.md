@@ -37,7 +37,7 @@ Presuming that you have downloaded and unzipped
 in the root of C drive.
 
 Open command prompt in the directory where you have
-downloaded or cloned SvcBatch and do the following
+downloaded or cloned Lua and do the following
 
 ```cmd
 > C:\cmsc-15.0_33\setenv.bat
@@ -112,8 +112,8 @@ Debug builds can be made by adding `_DEBUG=1` as nmake parameter
 ```
 
 This will create Lua biraries and libraries that are linked to
-**-MTd** or **-MDd**, and create **.pdb** files that
-can be used for debugging purposes.
+**-MTd** or **-MDd**. Note that **.pdb** files that
+can be used for debugging purposes are always created.
 
 ### Makefile targets
 
@@ -128,7 +128,7 @@ This will remove all produced binaries and object files
 by deleting **x64** subdirectory.
 
 ```cmd
-> nmake install PREFIX=C:\some\directory
+> nmake PREFIX=C:\some\directory install
 ```
 
 Standard makefile install target that will
@@ -138,6 +138,11 @@ This can be useful if you are building Lua with
 some Continuous build application that needs produced
 binaries at a specific location for later use.
 
+To install **.pdb** files call the **install-pdb** target
+
+```cmd
+> nmake PREFIX=C:\some\directory install-pdb
+```
 
 # License
 
