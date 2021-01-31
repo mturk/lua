@@ -128,21 +128,15 @@ This will remove all produced binaries and object files
 by deleting **x64** subdirectory.
 
 ```cmd
-> nmake PREFIX=C:\some\directory install
+> nmake INSTALLDIR=C:\some\directory install
 ```
 
 Standard makefile install target that will
-copy the executables, libraries and include files to the PREFIX location.
+copy the executables, libraries and include files to the INSTALLDIR location.
 
 This can be useful if you are building Lua with
 some Continuous build application that needs produced
 binaries at a specific location for later use.
-
-To install **.pdb** files call the **install-pdb** target
-
-```cmd
-> nmake PREFIX=C:\some\directory install-pdb
-```
 
 # License
 
