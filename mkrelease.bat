@@ -17,30 +17,46 @@ rem
 rem --------------------------------------------------
 rem Lua release helper script
 rem
-rem Usage: mkrelease.bat [version]
+rem Usage: mkrelease.bat version target
+rem    eg: mkrelease 5.4.23 x64
 rem
 setlocal
-if not "x%~1" == "x" goto haveVersion
+if "x%~1" == "x" goto Einval
+if "x%~2" == "x" goto Einval
 rem
-echo Error: Missing release version
-echo Usage: %~nx0 [version]
-exit /b 1
-
-:haveVersion
 set "LuaVersion=%~1"
+set "LuaTarget=%~2"
+rem
+set "LuaDistro=%LuaVersion%-win-%LuaTarget%"
+pushd %~dp0
+set "BuildDir=%cd%"
+popd
+rem
+rem Create builds
+nmake "INSTALLDIR=%BuildDir%\dist\lua-%LuaDistro%" _STATIC=1 install
+nmake "INSTALLDIR=%BuildDir%\dist\lua-%LuaDistro%" install
 rem
 rem Set path for ClamAV and 7za
 rem
 set "PATH=C:\Tools\clamav;C:\Utils;%PATH%"
+pushd "%BuildDir%\dist"
 rem
 freshclam.exe --quiet
-echo ## Binary release v%LuaVersion% > lua-%LuaVersion%.txt
-echo. >> lua-%LuaVersion%.txt
-echo. >> lua-%LuaVersion%.txt
-echo ```no-highlight >> lua-%LuaVersion%.txt
-clamscan.exe --version >> lua-%LuaVersion%.txt
-clamscan.exe --bytecode=no -r lua-%LuaVersion%-win-x64 >> lua-%LuaVersion%.txt
-echo ``` >> lua-%LuaVersion%.txt
-7za.exe a -bd lua-%LuaVersion%-win-x64.zip lua-%LuaVersion%-win-x64
-sigtool.exe --sha256 lua-%LuaVersion%-win-x64.zip >> lua-%LuaVersion%-sha256.txt
+echo ## Binary release v%LuaVersion% > lua-%LuaDistro%.txt
+echo. >> lua-%LuaDistro%.txt
+echo. >> lua-%LuaDistro%.txt
+echo ```no-highlight >> lua-%LuaDistro%.txt
+clamscan.exe --version >> lua-%LuaDistro%.txt
+clamscan.exe --bytecode=no -r lua-%LuaDistro% >> lua-%LuaDistro%.txt
+echo ``` >> lua-%LuaDistro%.txt
+7za.exe a -bd lua-%LuaDistro%.zip lua-%LuaDistro%
+sigtool.exe --sha256 lua-%LuaDistro%.zip >> lua-%LuaDistro%-sha256.txt
 rem
+popd
+goto End
+:Einval
+echo Error: Invalid parameter
+echo Usage: %~nx0 version target
+exit /b 1
+
+:End
