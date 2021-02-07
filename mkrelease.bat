@@ -15,26 +15,27 @@ rem See the License for the specific language governing permissions and
 rem limitations under the License.
 rem
 rem --------------------------------------------------
-rem Lua release helper script
+rem Release helper script
 rem
-rem Usage: mkrelease.bat version target
-rem    eg: mkrelease 5.4.23 x64
+rem Usage: mkrelease.bat version architecture
+rem    eg: mkrelease 5.4.2_3 x64
 rem
 setlocal
 if "x%~1" == "x" goto Einval
 if "x%~2" == "x" goto Einval
 rem
-set "LuaVersion=%~1"
-set "LuaTarget=%~2"
+set "ProjectName=lua"
+set "ReleaseVersion=%~1"
+set "ReleaseArch=%~2"
 rem
-set "LuaDistro=%LuaVersion%-win-%LuaTarget%"
+set "ReleaseName=%ProjectName%-%ReleaseVersion%-win-%ReleaseArch%"
 pushd %~dp0
 set "BuildDir=%cd%"
 popd
 rem
 rem Create builds
-nmake "INSTALLDIR=%BuildDir%\dist\lua-%LuaDistro%" _STATIC=1 install
-nmake "INSTALLDIR=%BuildDir%\dist\lua-%LuaDistro%" install
+nmake "INSTALLDIR=%BuildDir%\dist\%ReleaseName%" _STATIC=1 install
+nmake "INSTALLDIR=%BuildDir%\dist\%ReleaseName%" install
 rem
 rem Set path for ClamAV and 7za
 rem
@@ -42,15 +43,15 @@ set "PATH=C:\Tools\clamav;C:\Utils;%PATH%"
 pushd "%BuildDir%\dist"
 rem
 freshclam.exe --quiet
-echo ## Binary release v%LuaVersion% > lua-%LuaDistro%.txt
-echo. >> lua-%LuaDistro%.txt
-echo. >> lua-%LuaDistro%.txt
-echo ```no-highlight >> lua-%LuaDistro%.txt
-clamscan.exe --version >> lua-%LuaDistro%.txt
-clamscan.exe --bytecode=no -r lua-%LuaDistro% >> lua-%LuaDistro%.txt
-echo ``` >> lua-%LuaDistro%.txt
-7za.exe a -bd lua-%LuaDistro%.zip lua-%LuaDistro%
-sigtool.exe --sha256 lua-%LuaDistro%.zip >> lua-%LuaDistro%-sha256.txt
+echo ## Binary release v%ReleaseVersion% > %ReleaseName%.txt
+echo. >> %ReleaseName%.txt
+echo. >> %ReleaseName%.txt
+echo ```no-highlight >> %ReleaseName%.txt
+clamscan.exe --version >> %ReleaseName%.txt
+clamscan.exe --bytecode=no -r %ReleaseName% >> %ReleaseName%.txt
+echo ``` >> %ReleaseName%.txt
+7za.exe a -bd %ReleaseName%.zip %ReleaseName%
+sigtool.exe --sha256 %ReleaseName%.zip >> %ReleaseName%-sha256.txt
 rem
 popd
 goto End
