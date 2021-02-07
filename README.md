@@ -102,18 +102,6 @@ static version of the library add `_STATIC=1` as nmake parameter
 This will build **lua54.lib**, **lua.exe** and **luac.exe**.
 The binary should be inside **x64-rel-lib** subdirectory.
 
-### Debug builds
-
-Debug builds can be made by adding `_DEBUG=1` as nmake parameter
-
-```cmd
-> nmake _DEBUG=1
-
-```
-
-This will create Lua biraries and libraries that are linked to
-**-MTd** or **-MDd**. Note that **.pdb** files that
-can be used for debugging purposes are always created.
 
 ### Makefile targets
 
@@ -137,6 +125,18 @@ copy the executables, libraries and include files to the INSTALLDIR location.
 This can be useful if you are building Lua with
 some Continuous build application that needs produced
 binaries at a specific location for later use.
+
+
+## Create Release
+
+To create a release use the provided **mkrelease.bat** script
+
+```cmd
+> mkrelease.bat 5.4.2_1 x64
+```
+
+Inside **distr** directory you can find .zip and .txt files
+containing build artifacts and release metadata
 
 # License
 
