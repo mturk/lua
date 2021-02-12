@@ -26,7 +26,7 @@
 #include "lua.h"
 #include <winver.h>
 
-#define LUA_VERSION_VENDOR "_2"
+#define LUA_VERSION_VENDOR "_3"
 #define LUA_VERSION_STR \
         LUA_VERSION_MAJOR "." \
         LUA_VERSION_MINOR "." \
