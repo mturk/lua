@@ -70,7 +70,7 @@ CFLAGS = $(CFLAGS) -DLUA_COMPAT_5_3 -D_CRT_SECURE_NO_WARNINGS
 CFLAGS = $(CFLAGS) -D_CMSC_VERSION=$(CMSC_VERSION)
 !ENDIF
 CFLAGS = $(CFLAGS) -D_CRT_SECURE_NO_DEPRECATE -D_CRT_NONSTDC_NO_DEPRECATE $(EXTRA_CFLAGS)
-LFLAGS = /nologo /INCREMENTAL:NO /DEBUG $(LFLAGS) /SUBSYSTEM:CONSOLE /MACHINE:$(CPU) $(EXTRA_LFLAGS)
+LFLAGS = /nologo /INCREMENTAL:NO $(LFLAGS) /SUBSYSTEM:CONSOLE /MACHINE:$(CPU) $(EXTRA_LFLAGS)
 
 !IF DEFINED(_STATIC)
 TARGET  = lib
@@ -92,10 +92,22 @@ LLUAPDB = /pdb:$(WORKDIR)\$(LDNAME).pdb
 LUAIPDB = /pdb:$(WORKDIR)\lua.pdb
 LUACPDB = /pdb:$(WORKDIR)\luac.pdb
 
-CLOPTS = /c /nologo $(CRT_CFLAGS) -W3 -O2 -Ob2 -Zi
+CLOPTS = /c /nologo $(CRT_CFLAGS) -W3 -O2 -Ob2
 RFLAGS = /l 0x409 /n /i $(SRCDIR)\src $(RFLAGS) /d WIN32 /d WINNT /d WINVER=$(WINVER)
 RFLAGS = $(RFLAGS) /d _WIN32_WINNT=$(WINVER) $(EXTRA_RFLAGS)
 LDLIBS = kernel32.lib $(EXTRA_LIBS)
+
+!IF !DEFINED(_NO_PDB) || "$(_NO_PDB)" == ""
+LLUAPDB = /pdb:$(WORKDIR)\$(LDNAME).pdb
+LUAIPDB = /pdb:$(WORKDIR)\lua.pdb
+LUACPDB = /pdb:$(WORKDIR)\luac.pdb
+LLUAFDN = /Fd$(WORKDIR)\$(LDNAME)
+LUAIFDN = /Fd$(WORKDIR)\lua
+LUACFDN = /Fd$(WORKDIR)\luac
+CLOPTS  = $(CLOPTS) -Zi
+LDFLAGS = $(LDFLAGS) /DEBUG
+!ENDIF
+
 
 LLUAOBJS = \
 	$(WORKDIR)\lapi.obj \
@@ -143,13 +155,13 @@ $(WORKDIR) :
 	@-md $(WORKDIR)
 
 {$(SRCDIR)\src}.c{$(WORKDIR)}.obj:
-	$(CC) $(CLOPTS) $(CFLAGS) -Fo$(WORKDIR)\ -Fd$(WORKDIR)\$(LDNAME) $<
+	$(CC) $(CLOPTS) $(CFLAGS) -Fo$(WORKDIR)\ $(LLUAFDN) $<
 
 $(LUAIOBJS) :
-	$(CC) $(CLOPTS) $(CFLAGS) -Fo$(WORKDIR)\ -Fd$(WORKDIR)\lua  $(SRCDIR)\src\lua.c
+	$(CC) $(CLOPTS) $(CFLAGS) -Fo$(WORKDIR)\ $(LUAIFDN)  $(SRCDIR)\src\lua.c
 
 $(LUACOBJS) :
-	$(CC) $(CLOPTS) $(CFLAGS) -Fo$(WORKDIR)\ -Fd$(WORKDIR)\luac $(SRCDIR)\src\luac.c
+	$(CC) $(CLOPTS) $(CFLAGS) -Fo$(WORKDIR)\ $(LUACFDN) $(SRCDIR)\src\luac.c
 
 $(LIBLUA) : $(WORKDIR) $(LLUAOBJS)
 !IF "$(TARGET)" == "dll"
@@ -189,7 +201,9 @@ install : all
 	@xcopy /Y /Q "$(SRCDIR)\src\luaconf.h" "$(INSTALLDIR)\include"
 	@xcopy /Y /Q "$(SRCDIR)\src\lualib.h"  "$(INSTALLDIR)\include"
 	@xcopy /Y /Q "$(SRCDIR)\src\lauxlib.h" "$(INSTALLDIR)\include"
+!IF !DEFINED(_NO_PDB) || "$(_NO_PDB)" == ""
 	@xcopy /I /Y /Q "$(WORKDIR)\*.pdb" "$(INSTALLDIR)\bin"
+!ENDIF
 !ENDIF
 
 clean :
