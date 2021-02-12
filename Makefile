@@ -97,15 +97,15 @@ RFLAGS = /l 0x409 /n /i $(SRCDIR)\src $(RFLAGS) /d WIN32 /d WINNT /d WINVER=$(WI
 RFLAGS = $(RFLAGS) /d _WIN32_WINNT=$(WINVER) $(EXTRA_RFLAGS)
 LDLIBS = kernel32.lib $(EXTRA_LIBS)
 
-!IF !DEFINED(_NO_PDB) || "$(_NO_PDB)" == ""
-LLUAPDB = /pdb:$(WORKDIR)\$(LDNAME).pdb
-LUAIPDB = /pdb:$(WORKDIR)\lua.pdb
-LUACPDB = /pdb:$(WORKDIR)\luac.pdb
-LLUAFDN = /Fd$(WORKDIR)\$(LDNAME)
-LUAIFDN = /Fd$(WORKDIR)\lua
-LUACFDN = /Fd$(WORKDIR)\luac
-CLOPTS  = $(CLOPTS) -Zi
-LDFLAGS = $(LDFLAGS) /DEBUG
+!IF DEFINED(_PDB)
+LLUAPDBO = /pdb:$(WORKDIR)\$(LDNAME).pdb
+LUAIPDBO = /pdb:$(WORKDIR)\lua.pdb
+LUACPDBO = /pdb:$(WORKDIR)\luac.pdb
+LLUAPDBN = /Fd$(WORKDIR)\$(LDNAME)
+LUAIPDBN = /Fd$(WORKDIR)\lua
+LUACPDBN = /Fd$(WORKDIR)\luac
+CLOPTS   = $(CLOPTS) -Zi
+LDFLAGS  = $(LDFLAGS) /DEBUG
 !ENDIF
 
 
@@ -155,30 +155,30 @@ $(WORKDIR) :
 	@-md $(WORKDIR)
 
 {$(SRCDIR)\src}.c{$(WORKDIR)}.obj:
-	$(CC) $(CLOPTS) $(CFLAGS) -Fo$(WORKDIR)\ $(LLUAFDN) $<
+	$(CC) $(CLOPTS) $(CFLAGS) -Fo$(WORKDIR)\ $(LLUAPDBN) $<
 
 $(LUAIOBJS) :
-	$(CC) $(CLOPTS) $(CFLAGS) -Fo$(WORKDIR)\ $(LUAIFDN)  $(SRCDIR)\src\lua.c
+	$(CC) $(CLOPTS) $(CFLAGS) -Fo$(WORKDIR)\ $(LUAIPDBN)  $(SRCDIR)\src\lua.c
 
 $(LUACOBJS) :
-	$(CC) $(CLOPTS) $(CFLAGS) -Fo$(WORKDIR)\ $(LUACFDN) $(SRCDIR)\src\luac.c
+	$(CC) $(CLOPTS) $(CFLAGS) -Fo$(WORKDIR)\ $(LUACPDBN) $(SRCDIR)\src\luac.c
 
 $(LIBLUA) : $(WORKDIR) $(LLUAOBJS)
 !IF "$(TARGET)" == "dll"
 	$(RC) $(RFLAGS) /d BIN_NAME="$(LDNAME).dll" /d APP_NAME="Lua Library" /fo $(WORKDIR)\$(LDNAME).res $(SRCDIR)\lua.rc
-	$(LN) $(LDFLAGS) $(LLUAOBJS) $(WORKDIR)\$(LDNAME).res $(LDLIBS) $(LLUAPDB) /out:$(LIBLUA)
+	$(LN) $(LDFLAGS) $(LLUAOBJS) $(WORKDIR)\$(LDNAME).res $(LDLIBS) $(LLUAPDBO) /out:$(LIBLUA)
 !ELSE
 	$(AR) $(ARFLAGS) $(LLUAOBJS) /out:$(LIBLUA)
 !ENDIF
 
 $(LUAI) : $(LIBLUA) $(LUAIOBJS)
 	$(RC) $(RFLAGS) /d BIN_NAME="lua.exe" /d APP_NAME="Lua Command Line Interpreter" /d APP_FILE /d ICO_FILE /fo $(WORKDIR)\lua.res $(SRCDIR)\lua.rc
-	$(LN) $(LFLAGS) $(LUAIOBJS) $(WORKDIR)\lua.res $(LLUA) $(LDLIBS) $(LUAIPDB) /out:$(LUAI)
+	$(LN) $(LFLAGS) $(LUAIOBJS) $(WORKDIR)\lua.res $(LLUA) $(LDLIBS) $(LUAIPDBO) /out:$(LUAI)
 
 !IF "$(TARGET)" == "lib"
 $(LUAC) : $(LIBLUA) $(LUACOBJS)
 	$(RC) $(RFLAGS) /d BIN_NAME="luac.exe" /d APP_NAME="Lua Compiler" /d APP_FILE /d ICO_FILE /fo $(WORKDIR)\luac.res $(SRCDIR)\lua.rc
-	$(LN) $(LFLAGS) $(LUACOBJS) $(WORKDIR)\luac.res $(LLUA) $(LDLIBS) $(LUACPDB) /out:$(LUAC)
+	$(LN) $(LFLAGS) $(LUACOBJS) $(WORKDIR)\luac.res $(LLUA) $(LDLIBS) $(LUACPDBO) /out:$(LUAC)
 !ELSE
 $(LUAC) :
 
@@ -201,7 +201,7 @@ install : all
 	@xcopy /Y /Q "$(SRCDIR)\src\luaconf.h" "$(INSTALLDIR)\include"
 	@xcopy /Y /Q "$(SRCDIR)\src\lualib.h"  "$(INSTALLDIR)\include"
 	@xcopy /Y /Q "$(SRCDIR)\src\lauxlib.h" "$(INSTALLDIR)\include"
-!IF !DEFINED(_NO_PDB) || "$(_NO_PDB)" == ""
+!IF DEFINED(_PDB)
 	@xcopy /I /Y /Q "$(WORKDIR)\*.pdb" "$(INSTALLDIR)\bin"
 !ENDIF
 !ENDIF
