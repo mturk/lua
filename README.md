@@ -7,7 +7,7 @@ language. Lua is free software.
 For complete information, visit Lua's web site at http://www.lua.org/ .
 For an executive summary, see http://www.lua.org/about.html .
 
-This is Lua 5.4.2, released on 13 Nov 2020.
+This is Lua 5.4.3, released on 2021-03-15.
 
 ## Building Lua
 
@@ -40,7 +40,7 @@ Open command prompt in the directory where you have
 downloaded or cloned Lua and do the following
 
 ```cmd
-> C:\cmsc-15.0_33\setenv.bat
+> C:\cmsc-15.0_39\setenv.bat
 Using default architecture: x64
 Setting build environment for win-x64/0x0601
 
@@ -132,10 +132,10 @@ binaries at a specific location for later use.
 To create a release use the provided **mkrelease.bat** script
 
 ```cmd
-> mkrelease.bat 5.4.2_1 x64
+> mkrelease.bat 5.4.3_1 x64 "_VENDOR_SFX=_1"
 ```
 
-Inside **distr** directory you can find .zip and .txt files
+Inside **dist** directory you can find .zip and .txt files
 containing build artifacts and release metadata
 
 # License

@@ -23,22 +23,33 @@
  *
  */
 
+#include <windows.h>
 #include "lua.h"
-#include <winver.h>
 
-#define LUA_VERSION_VENDOR "_3"
+#define CPP_TOSTR_HELPER(n) 	#n
+#define CPP_TOSTR(n)        	CPP_TOSTR_HELPER(n)
+
+#if defined(_VENDOR_NUM)
+# define LUA_PATCH_VERSION    	_VENDOR_NUM
+#else
+# define LUA_PATCH_VERSION      0
+#endif
+#if defined(_VENDOR_SFX)
+# define LUA_VENDOR_SFX        	CPP_TOSTR(_VENDOR_SFX)
+#else
+# define LUA_VENDOR_SFX    	    ""
+#endif
+
 #define LUA_VERSION_STR \
-        LUA_VERSION_MAJOR "." \
-        LUA_VERSION_MINOR "." \
-        LUA_VERSION_RELEASE \
-        LUA_VERSION_VENDOR
+								LUA_VERSION_MAJOR "." 	\
+								LUA_VERSION_MINOR "." 	\
+								LUA_VERSION_RELEASE 	\
+								LUA_VENDOR_SFX
 
-#define LUA_VERSION_CSV     5,4,2
-#define STRINGIFY_HELPER(n) #n
-#define STRINGIFY(n)        STRINGIFY_HELPER(n)
+#define LUA_VERSION_CSV     	5,4,3, LUA_PATCH_VERSION
 
-#define APP_NAME_STR STRINGIFY(APP_NAME)
-#define BIN_NAME_STR STRINGIFY(BIN_NAME)
+#define APP_NAME_STR 			CPP_TOSTR(APP_NAME)
+#define BIN_NAME_STR 			CPP_TOSTR(BIN_NAME)
 
 
 #ifdef ICO_FILE
@@ -46,8 +57,9 @@
 #endif
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION LUA_VERSION_CSV,0
- PRODUCTVERSION LUA_VERSION_CSV,0
+ FILEVERSION LUA_VERSION_CSV
+ PRODUCTVERSION LUA_VERSION_CSV
+ PRODUCTVERSION LUA_VERSION_CSV
  FILEFLAGSMASK VS_FFI_FILEFLAGSMASK
 #ifdef _DEBUG
  FILEFLAGS 0x1L  /* VS_FF_DEBUG */
