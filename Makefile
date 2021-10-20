@@ -26,15 +26,8 @@ AR = lib.exe
 RC = rc.exe
 SRCDIR = .
 
-!IF !DEFINED(BUILD_CPU) || "$(BUILD_CPU)" == ""
-!IF DEFINED(VSCMD_ARG_TGT_ARCH)
-CPU = $(VSCMD_ARG_TGT_ARCH)
-!ELSE
-!ERROR Must specify BUILD_CPU matching compiler x86 or x64
-!ENDIF
-!ELSE
-CPU = $(BUILD_CPU)
-!ENDIF
+_CPU = x64
+_LIB = lib64
 
 !IF !DEFINED(WINVER) || "$(WINVER)" == ""
 WINVER = 0x0601
@@ -59,30 +52,23 @@ RFLAGS = /d NDEBUG
 BLDVER = -rel-
 !ENDIF
 
-!IF !DEFINED(TARGET_LIB) || "$(TARGET_LIB)" == ""
-TARGET_LIB = lib
-!ENDIF
-
 CFLAGS = -I$(SRCDIR)\src $(CFLAGS)
 CFLAGS = $(CFLAGS) -DWIN32 -D_WIN32_WINNT=$(WINVER) -DWINVER=$(WINVER)
 CFLAGS = $(CFLAGS) -DLUA_COMPAT_5_3 -D_CRT_SECURE_NO_WARNINGS
-!IF DEFINED(CMSC_VERSION)
-CFLAGS = $(CFLAGS) -D_CMSC_VERSION=$(CMSC_VERSION)
-!ENDIF
 CFLAGS = $(CFLAGS) -D_CRT_SECURE_NO_DEPRECATE -D_CRT_NONSTDC_NO_DEPRECATE $(EXTRA_CFLAGS)
-LFLAGS = /nologo /INCREMENTAL:NO $(LFLAGS) /MACHINE:$(CPU) $(EXTRA_LFLAGS)
+LFLAGS = /nologo /INCREMENTAL:NO $(LFLAGS) /MACHINE:$(_CPU) $(EXTRA_LFLAGS)
 
 !IF DEFINED(_STATIC)
 TARGET  = lib
 LDNAME  = lua54
-ARFLAGS = /nologo /MACHINE:$(CPU) $(EXTRA_ARFLAGS)
+ARFLAGS = /nologo /MACHINE:$(_CPU) $(EXTRA_ARFLAGS)
 !ELSE
 TARGET  = dll
 CFLAGS  = $(CFLAGS) -DLUA_BUILD_AS_DLL
 LDNAME  = liblua54
 !ENDIF
 
-WORKDIR = $(CPU)$(BLDVER)$(TARGET)
+WORKDIR = $(_CPU)$(BLDVER)$(TARGET)
 LIBLUA  = $(WORKDIR)\$(LDNAME).$(TARGET)
 LLUA    = $(WORKDIR)\$(LDNAME).lib
 LUAI    = $(WORKDIR)\lua.exe
@@ -190,25 +176,25 @@ $(LUAC) :
 
 !ENDIF
 
-!IF !DEFINED(INSTALLDIR) || "$(INSTALLDIR)" == ""
+!IF !DEFINED(PREFIX) || "$(PREFIX)" == ""
 install :
-	@echo INSTALLDIR is not defined
-	@echo Use `nmake install INSTALLDIR=directory`
+	@echo PREFIX is not defined
+	@echo Use `nmake install PREFIX=directory`
 	@echo.
 	@exit /B 1
 !ELSE
 install : all
 !IF "$(TARGET)" == "dll"
-	@xcopy /I /Y /Q "$(WORKDIR)\*.dll" "$(INSTALLDIR)\bin"
+	@xcopy /I /Y /Q "$(WORKDIR)\*.dll" "$(PREFIX)\bin"
 !ENDIF
-	@xcopy /I /Y /Q "$(WORKDIR)\*.exe" "$(INSTALLDIR)\bin"
-	@xcopy /I /Y /Q "$(WORKDIR)\*.lib" "$(INSTALLDIR)\$(TARGET_LIB)"
-	@xcopy /I /Y /Q "$(SRCDIR)\src\lua.h*" "$(INSTALLDIR)\include"
-	@xcopy /Y /Q "$(SRCDIR)\src\luaconf.h" "$(INSTALLDIR)\include"
-	@xcopy /Y /Q "$(SRCDIR)\src\lualib.h"  "$(INSTALLDIR)\include"
-	@xcopy /Y /Q "$(SRCDIR)\src\lauxlib.h" "$(INSTALLDIR)\include"
+	@xcopy /I /Y /Q "$(WORKDIR)\*.exe" "$(PREFIX)\bin"
+	@xcopy /I /Y /Q "$(WORKDIR)\*.lib" "$(PREFIX)\$(_LIB)"
+	@xcopy /I /Y /Q "$(SRCDIR)\src\lua.h*" "$(PREFIX)\include"
+	@xcopy /Y /Q "$(SRCDIR)\src\luaconf.h" "$(PREFIX)\include"
+	@xcopy /Y /Q "$(SRCDIR)\src\lualib.h"  "$(PREFIX)\include"
+	@xcopy /Y /Q "$(SRCDIR)\src\lauxlib.h" "$(PREFIX)\include"
 !IF DEFINED(_PDB)
-	@xcopy /I /Y /Q "$(WORKDIR)\*.pdb" "$(INSTALLDIR)\bin"
+	@xcopy /I /Y /Q "$(WORKDIR)\*.pdb" "$(PREFIX)\bin"
 !ENDIF
 !ENDIF
 
