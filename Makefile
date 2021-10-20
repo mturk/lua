@@ -27,7 +27,7 @@ RC = rc.exe
 SRCDIR = .
 
 _CPU = x64
-_LIB = lib64
+_LIB = lib
 
 !IF !DEFINED(WINVER) || "$(WINVER)" == ""
 WINVER = 0x0601
