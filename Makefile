@@ -73,31 +73,28 @@ LIBLUA  = $(WORKDIR)\$(LDNAME).$(TARGET)
 LLUA    = $(WORKDIR)\$(LDNAME).lib
 LUAI    = $(WORKDIR)\lua.exe
 LUAC    = $(WORKDIR)\luac.exe
-LLUAPDB = /pdb:$(WORKDIR)\$(LDNAME).pdb
-LUAIPDB = /pdb:$(WORKDIR)\lua.pdb
-LUACPDB = /pdb:$(WORKDIR)\luac.pdb
 
-CLOPTS = /c /nologo $(CRT_CFLAGS) -W3 -O2 -Ob2
-RFLAGS = /l 0x409 /n /i $(SRCDIR)\src $(RFLAGS) /d WIN32 /d WINNT /d WINVER=$(WINVER)
-RFLAGS = $(RFLAGS) /d _WIN32_WINNT=$(WINVER) $(EXTRA_RFLAGS)
-LDLIBS = kernel32.lib $(EXTRA_LIBS)
+CLOPTS  = /c /nologo $(CRT_CFLAGS) -W3 -O2 -Ob2
+RFLAGS  = /l 0x409 /n /i $(SRCDIR)\src $(RFLAGS) /d WIN32 /d WINNT /d WINVER=$(WINVER)
+RFLAGS  = $(RFLAGS) /d _WIN32_WINNT=$(WINVER) $(EXTRA_RFLAGS)
+LDLIBS  = kernel32.lib $(EXTRA_LIBS)
 
 !IF DEFINED(_VENDOR_SFX)
-RFLAGS = $(RFLAGS) /d _VENDOR_SFX=$(_VENDOR_SFX)
+RFLAGS  = $(RFLAGS) /d _VENDOR_SFX=$(_VENDOR_SFX)
 !ENDIF
 !IF DEFINED(_VENDOR_NUM)
-RFLAGS = $(RFLAGS) /d _VENDOR_NUM=$(_VENDOR_NUM)
+RFLAGS  = $(RFLAGS) /d _VENDOR_NUM=$(_VENDOR_NUM)
 !ENDIF
 
 !IF DEFINED(_PDB)
-LLUAPDBO = /pdb:$(WORKDIR)\$(LDNAME).pdb
-LUAIPDBO = /pdb:$(WORKDIR)\lua.pdb
-LUACPDBO = /pdb:$(WORKDIR)\luac.pdb
-LLUAPDBN = /Fd$(WORKDIR)\$(LDNAME)
-LUAIPDBN = /Fd$(WORKDIR)\lua
-LUACPDBN = /Fd$(WORKDIR)\luac
-CLOPTS   = $(CLOPTS) -Zi
-LDFLAGS  = $(LDFLAGS) /DEBUG
+LLUAPDB = /pdb:$(WORKDIR)\$(LDNAME).pdb
+LUAIPDB = /pdb:$(WORKDIR)\lua.pdb
+LUACPDB = /pdb:$(WORKDIR)\luac.pdb
+LLUAPFD = -Fd$(WORKDIR)\$(LDNAME)
+LUAIPFD = -Fd$(WORKDIR)\lua
+LUACPFD = -Fd$(WORKDIR)\luac
+CLOPTS  = $(CLOPTS) -Zi
+LDFLAGS = $(LDFLAGS) /DEBUG
 !ENDIF
 
 
@@ -143,47 +140,46 @@ LUAIOBJS = \
 
 all : $(WORKDIR) $(LIBLUA) $(LUAI) $(LUAC)
 
-$(WORKDIR) :
+$(WORKDIR):
 	@-md $(WORKDIR)
 
 {$(SRCDIR)\src}.c{$(WORKDIR)}.obj:
-	$(CC) $(CLOPTS) $(CFLAGS) -Fo$(WORKDIR)\ $(LLUAPDBN) $<
+	$(CC) $(CLOPTS) $(CFLAGS) -Fo$(WORKDIR)\ $(LLUAPFD) $<
 
-$(LUAIOBJS) :
-	$(CC) $(CLOPTS) $(CFLAGS) -Fo$(WORKDIR)\ $(LUAIPDBN)  $(SRCDIR)\src\lua.c
+$(LUAIOBJS):
+	$(CC) $(CLOPTS) $(CFLAGS) -Fo$(WORKDIR)\ $(LUAIPFD) $(SRCDIR)\src\lua.c
 
-$(LUACOBJS) :
-	$(CC) $(CLOPTS) $(CFLAGS) -Fo$(WORKDIR)\ $(LUACPDBN) $(SRCDIR)\src\luac.c
+$(LUACOBJS):
+	$(CC) $(CLOPTS) $(CFLAGS) -Fo$(WORKDIR)\ $(LUACPFD) $(SRCDIR)\src\luac.c
 
-$(LIBLUA) : $(WORKDIR) $(LLUAOBJS)
+$(LIBLUA): $(LLUAOBJS)
 !IF "$(TARGET)" == "dll"
 	$(RC) $(RFLAGS) /d BIN_NAME="$(LDNAME).dll" /d APP_NAME="Lua Library" /fo $(WORKDIR)\$(LDNAME).res $(SRCDIR)\lua.rc
-	$(LN) $(LFLAGS) /DLL /SUBSYSTEM:WINDOWS $(LLUAOBJS) $(WORKDIR)\$(LDNAME).res $(LDLIBS) $(LLUAPDBO) /out:$(LIBLUA)
+	$(LN) $(LFLAGS) /DLL /SUBSYSTEM:WINDOWS $(LLUAOBJS) $(WORKDIR)\$(LDNAME).res $(LDLIBS) $(LLUAPDB) /out:$(LIBLUA)
 !ELSE
 	$(AR) $(ARFLAGS) $(LLUAOBJS) /out:$(LIBLUA)
 !ENDIF
 
-$(LUAI) : $(LIBLUA) $(LUAIOBJS)
+$(LUAI): $(LIBLUA) $(LUAIOBJS)
 	$(RC) $(RFLAGS) /d BIN_NAME="lua.exe" /d APP_NAME="Lua Command Line Interpreter" /d APP_FILE /d ICO_FILE /fo $(WORKDIR)\lua.res $(SRCDIR)\lua.rc
-	$(LN) $(LFLAGS) /SUBSYSTEM:CONSOLE $(LUAIOBJS) $(WORKDIR)\lua.res $(LLUA) $(LDLIBS) $(LUAIPDBO) /out:$(LUAI)
+	$(LN) $(LFLAGS) /SUBSYSTEM:CONSOLE $(LUAIOBJS) $(WORKDIR)\lua.res $(LLUA) $(LDLIBS) $(LUAIPDB) /out:$(LUAI)
 
 !IF "$(TARGET)" == "lib"
-$(LUAC) : $(LIBLUA) $(LUACOBJS)
+$(LUAC): $(LIBLUA) $(LUACOBJS)
 	$(RC) $(RFLAGS) /d BIN_NAME="luac.exe" /d APP_NAME="Lua Compiler" /d APP_FILE /d ICO_FILE /fo $(WORKDIR)\luac.res $(SRCDIR)\lua.rc
-	$(LN) $(LFLAGS) /SUBSYSTEM:CONSOLE $(LUACOBJS) $(WORKDIR)\luac.res $(LLUA) $(LDLIBS) $(LUACPDBO) /out:$(LUAC)
+	$(LN) $(LFLAGS) /SUBSYSTEM:CONSOLE $(LUACOBJS) $(WORKDIR)\luac.res $(LLUA) $(LDLIBS) $(LUACPDB) /out:$(LUAC)
 !ELSE
-$(LUAC) :
-
+$(LUAC):
 !ENDIF
 
 !IF !DEFINED(PREFIX) || "$(PREFIX)" == ""
-install :
+install:
 	@echo PREFIX is not defined
 	@echo Use `nmake install PREFIX=directory`
 	@echo.
 	@exit /B 1
 !ELSE
-install : all
+install: all
 !IF "$(TARGET)" == "dll"
 	@xcopy /I /Y /Q "$(WORKDIR)\*.dll" "$(PREFIX)\bin"
 !ENDIF
@@ -198,5 +194,5 @@ install : all
 !ENDIF
 !ENDIF
 
-clean :
+clean:
 	@-rd /S /Q $(WORKDIR) 2>NUL

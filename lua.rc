@@ -26,30 +26,30 @@
 #include <windows.h>
 #include "lua.h"
 
-#define CPP_TOSTR_HELPER(n) 	#n
-#define CPP_TOSTR(n)        	CPP_TOSTR_HELPER(n)
+#define CPP_TOSTR_HELPER(n)     #n
+#define CPP_TOSTR(n)            CPP_TOSTR_HELPER(n)
 
 #if defined(_VENDOR_NUM)
-# define LUA_PATCH_VERSION    	_VENDOR_NUM
+# define LUA_PATCH_VERSION      _VENDOR_NUM
 #else
 # define LUA_PATCH_VERSION      0
 #endif
 #if defined(_VENDOR_SFX)
-# define LUA_VENDOR_SFX        	CPP_TOSTR(_VENDOR_SFX)
+# define LUA_VENDOR_SFX         CPP_TOSTR(_VENDOR_SFX)
 #else
-# define LUA_VENDOR_SFX    	    ""
+# define LUA_VENDOR_SFX         ""
 #endif
 
 #define LUA_VERSION_STR \
-								LUA_VERSION_MAJOR "." 	\
-								LUA_VERSION_MINOR "." 	\
-								LUA_VERSION_RELEASE 	\
-								LUA_VENDOR_SFX
+                                LUA_VERSION_MAJOR "."   \
+                                LUA_VERSION_MINOR "."   \
+                                LUA_VERSION_RELEASE     \
+                                LUA_VENDOR_SFX
 
-#define LUA_VERSION_CSV     	5,4,3, LUA_PATCH_VERSION
+#define LUA_VERSION_CSV         5,4,3, LUA_PATCH_VERSION
 
-#define APP_NAME_STR 			CPP_TOSTR(APP_NAME)
-#define BIN_NAME_STR 			CPP_TOSTR(BIN_NAME)
+#define APP_NAME_STR            CPP_TOSTR(APP_NAME)
+#define BIN_NAME_STR            CPP_TOSTR(BIN_NAME)
 
 
 #ifdef ICO_FILE
