@@ -164,13 +164,9 @@ $(LUAI): $(LIBLUA) $(LUAIOBJS)
 	$(RC) $(RFLAGS) /d BIN_NAME="lua.exe" /d APP_NAME="Lua Command Line Interpreter" /d APP_FILE /d ICO_FILE /fo $(WORKDIR)\lua.res $(SRCDIR)\lua.rc
 	$(LN) $(LFLAGS) /SUBSYSTEM:CONSOLE $(LUAIOBJS) $(WORKDIR)\lua.res $(LLUA) $(LDLIBS) $(LUAIPDB) /out:$(LUAI)
 
-!IF "$(TARGET)" == "lib"
 $(LUAC): $(LIBLUA) $(LUACOBJS)
 	$(RC) $(RFLAGS) /d BIN_NAME="luac.exe" /d APP_NAME="Lua Compiler" /d APP_FILE /d ICO_FILE /fo $(WORKDIR)\luac.res $(SRCDIR)\lua.rc
 	$(LN) $(LFLAGS) /SUBSYSTEM:CONSOLE $(LUACOBJS) $(WORKDIR)\luac.res $(LLUA) $(LDLIBS) $(LUACPDB) /out:$(LUAC)
-!ELSE
-$(LUAC):
-!ENDIF
 
 !IF !DEFINED(PREFIX) || "$(PREFIX)" == ""
 install:
