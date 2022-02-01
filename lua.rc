@@ -46,7 +46,7 @@
                                 LUA_VERSION_RELEASE     \
                                 LUA_VENDOR_SFX
 
-#define LUA_VERSION_CSV         5,4,3, LUA_PATCH_VERSION
+#define LUA_VERSION_CSV         5,4,4, LUA_PATCH_VERSION
 
 #define APP_NAME_STR            CPP_TOSTR(APP_NAME)
 #define BIN_NAME_STR            CPP_TOSTR(BIN_NAME)

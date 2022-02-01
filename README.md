@@ -7,7 +7,7 @@ language. Lua is free software.
 For complete information, visit Lua's web site at http://www.lua.org/ .
 For an executive summary, see http://www.lua.org/about.html .
 
-This is Lua 5.4.3, released on 2021-03-15.
+This is Lua 5.4.4, released on 2022-01-26.
 
 ## Building Lua
 
