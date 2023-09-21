@@ -29,35 +29,56 @@ set "ReleaseVersion=%~1"
 set "ReleaseArch=%~2"
 rem
 set "ReleaseName=%ProjectName%-%ReleaseVersion%-win-%ReleaseArch%"
+set "ReleaseLog=%ReleaseName%.txt
 pushd %~dp0
 set "BuildDir=%cd%"
 popd
+nmake /nologo clean
+nmake /nologo clean _STATIC=1
+if not %ERRORLEVEL% == 0 goto Failed
 rem
 rem Create builds
-nmake "PREFIX=%BuildDir%\dist\%ReleaseName%" %~3 %~4 _STATIC=1 install
 nmake "PREFIX=%BuildDir%\dist\%ReleaseName%" %~3 %~4 install
+nmake "PREFIX=%BuildDir%\dist\%ReleaseName%" %~3 %~4 _STATIC=1 install
 rem
-rem Set path for ClamAV and 7za
-rem
-set "PATH=C:\Tools\clamav;C:\Utils;%PATH%"
 pushd "%BuildDir%\dist"
 rem
-freshclam.exe --quiet
-echo ## Binary release v%ReleaseVersion% > %ReleaseName%.txt
-echo. >> %ReleaseName%.txt
-echo. >> %ReleaseName%.txt
-echo ```no-highlight >> %ReleaseName%.txt
-clamscan.exe --version >> %ReleaseName%.txt
-clamscan.exe --bytecode=no -r %ReleaseName% >> %ReleaseName%.txt
-echo ``` >> %ReleaseName%.txt
+rem Get nmake and cl versions
+rem
+echo _MSC_FULL_VER > %ProjectName%.i
+nmake /? 2>%ProjectName%.p 1>NUL
+cl.exe /EP %ProjectName%.i >>%ProjectName%.p 2>&1
+rem
+echo ## Binary release v%ReleaseVersion% > %ReleaseLog%
+echo. >> %ReleaseLog%
+echo ```no-highlight >> %ReleaseLog%
+echo. >> %ReleaseLog%
+echo Compiled using: >> %ReleaseLog%
+echo nmake %~3 %~4 >> %ReleaseLog%
+findstr /B /C:"Microsoft (R) " %ProjectName%.p >> %ReleaseLog%
+echo. >> %ReleaseLog%
+rem
+del /F /Q %ProjectName%.i 2>NUL
+del /F /Q %ProjectName%.p 2>NUL
+echo. >> %ReleaseLog%
+echo. >> %ReleaseLog%
 7za.exe a -bd %ReleaseName%.zip %ReleaseName%
-sigtool.exe --sha256 %ReleaseName%.zip >> %ReleaseName%-sha256.txt
+certutil -hashfile %ReleaseName%.zip SHA256 | findstr /v "CertUtil" >> %ReleaseLog%
+echo. >> %ReleaseLog%
+echo ``` >> %ReleaseLog%
 rem
 popd
 goto End
+rem
 :Einval
 echo Error: Invalid parameter
 echo Usage: %~nx0 version target
 exit /b 1
-
+rem
+:Failed
+echo.
+echo Error: Cannot build %ProjectName%.exe
+exit /b 1
+rem
 :End
+exit /b 0
