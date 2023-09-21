@@ -15,7 +15,7 @@
 
 
 /* Active Lua function (given call info) */
-#define ci_func(ci)		(clLvalue(s2v((ci)->func)))
+#define ci_func(ci)		(clLvalue(s2v((ci)->func.p)))
 
 
 #define resethookcount(L)	(L->hookcount = L->basehookcount)
@@ -36,7 +36,7 @@
 #endif
 
 
-LUA_API   int luaG_getfuncline (const Proto *f, int pc);
+LUA_API int luaG_getfuncline (const Proto *f, int pc);
 LUAI_FUNC const char *luaG_findlocal (lua_State *L, CallInfo *ci, int n,
                                                     StkId *pos);
 LUAI_FUNC l_noret luaG_typeerror (lua_State *L, const TValue *o,

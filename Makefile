@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (C) 1964-2021 Mladen Turk
+# Copyright (C) 1964-2023 Mladen Turk
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal

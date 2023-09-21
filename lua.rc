@@ -1,7 +1,7 @@
 /**
  * MIT License
  *
- * Copyright (C) 1964-2021 Mladen Turk
+ * Copyright (C) 1964-2023 Mladen Turk
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -46,7 +46,7 @@
                                 LUA_VERSION_RELEASE     \
                                 LUA_VENDOR_SFX
 
-#define LUA_VERSION_CSV         5,4,4, LUA_PATCH_VERSION
+#define LUA_VERSION_CSV         5,4,6, LUA_PATCH_VERSION
 
 #define APP_NAME_STR            CPP_TOSTR(APP_NAME)
 #define BIN_NAME_STR            CPP_TOSTR(BIN_NAME)

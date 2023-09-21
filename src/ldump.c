@@ -10,6 +10,7 @@
 #include "lprefix.h"
 
 
+#include <limits.h>
 #include <stddef.h>
 
 #include "lua.h"
@@ -55,8 +56,11 @@ static void dumpByte (DumpState *D, int y) {
 }
 
 
-/* dumpInt Buff Size */
-#define DIBS    ((sizeof(size_t) * 8 / 7) + 1)
+/*
+** 'dumpSize' buffer size: each byte can store up to 7 bits. (The "+6"
+** rounds up the division.)
+*/
+#define DIBS    ((sizeof(size_t) * CHAR_BIT + 6) / 7)
 
 static void dumpSize (DumpState *D, size_t x) {
   lu_byte buff[DIBS];
@@ -210,7 +214,7 @@ static void dumpHeader (DumpState *D) {
 /*
 ** dump Lua function as precompiled chunk
 */
-LUA_API int luaU_dump(lua_State *L, const Proto *f, lua_Writer w, void *data,
+LUA_API luaU_dump(lua_State *L, const Proto *f, lua_Writer w, void *data,
               int strip) {
   DumpState D;
   D.L = L;
