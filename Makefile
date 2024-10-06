@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (C) 1964-2023 Mladen Turk
+# Copyright (C) 1964-2024 Mladen Turk
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -24,42 +24,27 @@ CC = cl.exe
 LN = link.exe
 AR = lib.exe
 RC = rc.exe
+MT = mt.exe
 SRCDIR = .
 
 _CPU = x64
 _LIB = lib
 
 !IF !DEFINED(WINVER) || "$(WINVER)" == ""
-WINVER = 0x0601
+WINVER = 0x0A00
 !ENDIF
 
-!IF DEFINED(_STATIC_MSVCRT)
-CRT_CFLAGS = -MT
-EXTRA_LIBS =
-!ELSE
-CRT_CFLAGS = -MD
-!ENDIF
-
-!IF DEFINED(_DEBUG)
-CRT_CFLAGS = $(CRT_CFLAGS)d
-CFLAGS = -DDEBUG -D_DEBUG
-RFLAGS = /d DEBUG /d _DEBUG
-BLDVER = -dbg-
-!ELSE
 CFLAGS = -DNDEBUG
-LFLAGS = /OPT:REF
-RFLAGS = /d NDEBUG
+LFLAGS = /nologo /OPT:REF /INCREMENTAL:NO
+RFLAGS = /nologo /d NDEBUG
 BLDVER = -rel-
-!IF DEFINED(_STATIC_MSVCRT) && "$(_STATIC_MSVCRT)" == "Hybrid"
 LFLAGS = $(LFLAGS) /NODEFAULTLIB:libucrt.lib /DEFAULTLIB:ucrt.lib
-!ENDIF
-!ENDIF
 
 CFLAGS = -I$(SRCDIR)\src $(CFLAGS)
 CFLAGS = $(CFLAGS) -DWIN32 -D_WIN32_WINNT=$(WINVER) -DWINVER=$(WINVER)
 CFLAGS = $(CFLAGS) -D_CRT_SECURE_NO_WARNINGS
 CFLAGS = $(CFLAGS) -D_CRT_SECURE_NO_DEPRECATE -D_CRT_NONSTDC_NO_DEPRECATE $(EXTRA_CFLAGS)
-LFLAGS = /nologo /INCREMENTAL:NO $(LFLAGS) /MACHINE:$(_CPU) $(EXTRA_LFLAGS)
+LFLAGS = $(LFLAGS) /MACHINE:$(_CPU) $(EXTRA_LFLAGS)
 
 !IF DEFINED(_STATIC)
 TARGET  = lib
@@ -77,10 +62,10 @@ LLUA    = $(WORKDIR)\$(LDNAME).lib
 LUAI    = $(WORKDIR)\lua.exe
 LUAC    = $(WORKDIR)\luac.exe
 
-CLOPTS  = /c /nologo $(CRT_CFLAGS) -W3 -O2 -Ob2
-RFLAGS  = /l 0x409 /n /i $(SRCDIR)\src $(RFLAGS) /d WIN32 /d WINNT /d WINVER=$(WINVER)
+CLOPTS  = /c /nologo -MT -W3 -O2 -Ob2
+RFLAGS  = $(RFLAGS) /l 0x409 /n /i $(SRCDIR)\src /d WIN32 /d WINNT /d WINVER=$(WINVER)
 RFLAGS  = $(RFLAGS) /d _WIN32_WINNT=$(WINVER) $(EXTRA_RFLAGS)
-LDLIBS  = kernel32.lib $(EXTRA_LIBS)
+LDLIBS  = kernel32.lib
 
 !IF DEFINED(_VENDOR_SFX)
 RFLAGS  = $(RFLAGS) /d _VENDOR_SFX=$(_VENDOR_SFX)
@@ -159,6 +144,7 @@ $(LIBLUA): $(LLUAOBJS)
 !IF "$(TARGET)" == "dll"
 	$(RC) $(RFLAGS) /d BIN_NAME="$(LDNAME).dll" /d APP_NAME="Lua Library" /fo $(WORKDIR)\$(LDNAME).res $(SRCDIR)\lua.rc
 	$(LN) $(LFLAGS) /DLL /SUBSYSTEM:WINDOWS $(LLUAOBJS) $(WORKDIR)\$(LDNAME).res $(LDLIBS) $(LLUAPDB) /out:$(LIBLUA)
+	$(MT) -manifest standard.manifest -outputresource:$(LIBLUA);2
 !ELSE
 	$(AR) $(ARFLAGS) $(LLUAOBJS) /out:$(LIBLUA)
 !ENDIF
@@ -166,10 +152,12 @@ $(LIBLUA): $(LLUAOBJS)
 $(LUAI): $(LIBLUA) $(LUAIOBJS)
 	$(RC) $(RFLAGS) /d BIN_NAME="lua.exe" /d APP_NAME="Lua Command Line Interpreter" /d APP_FILE /d ICO_FILE /fo $(WORKDIR)\lua.res $(SRCDIR)\lua.rc
 	$(LN) $(LFLAGS) /SUBSYSTEM:CONSOLE $(LUAIOBJS) $(WORKDIR)\lua.res $(LLUA) $(LDLIBS) $(LUAIPDB) /out:$(LUAI)
+	$(MT) -manifest standard.manifest -outputresource:$(LUAI);1
 
 $(LUAC): $(LIBLUA) $(LUACOBJS)
 	$(RC) $(RFLAGS) /d BIN_NAME="luac.exe" /d APP_NAME="Lua Compiler" /d APP_FILE /d ICO_FILE /fo $(WORKDIR)\luac.res $(SRCDIR)\lua.rc
 	$(LN) $(LFLAGS) /SUBSYSTEM:CONSOLE $(LUACOBJS) $(WORKDIR)\luac.res $(LLUA) $(LDLIBS) $(LUACPDB) /out:$(LUAC)
+	$(MT) -manifest standard.manifest -outputresource:$(LUAC);1
 
 !IF !DEFINED(PREFIX) || "$(PREFIX)" == ""
 install:

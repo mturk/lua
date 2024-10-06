@@ -18,7 +18,7 @@ rem --------------------------------------------------
 rem Release helper script
 rem
 rem Usage: mkrelease.bat version architecture
-rem    eg: mkrelease 5.4.6_1 x64 "_VENDOR_SFX=_1"
+rem    eg: mkrelease 5.4.7_1 x64 "_VENDOR_SFX=_1"
 rem
 setlocal
 if "x%~1" == "x" goto Einval

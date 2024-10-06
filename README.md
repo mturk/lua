@@ -7,7 +7,7 @@ language. Lua is free software.
 For complete information, visit Lua's web site at http://www.lua.org/ .
 For an executive summary, see http://www.lua.org/about.html .
 
-This is Lua 5.4.6, released on 2023-05-14.
+This is Lua 5.4.7, released on 2024-06-25.
 
 ## Building Lua
 
@@ -132,7 +132,7 @@ binaries at a specific location for later use.
 To create a release use the provided **mkrelease.bat** script
 
 ```cmd
-> mkrelease.bat 5.4.3_1 x64 "_VENDOR_SFX=_1"
+> mkrelease.bat 5.4.7_1 x64 "_VENDOR_SFX=_1"
 ```
 
 Inside **dist** directory you can find .zip and .txt files
